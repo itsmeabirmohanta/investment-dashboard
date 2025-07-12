@@ -1,10 +1,11 @@
 
 import React, { useState, useEffect } from 'react';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import Dashboard from '@/components/Dashboard';
 import TransactionForm from '@/components/TransactionForm';
 import TransactionHistory from '@/components/TransactionHistory';
 import GoldRateManager from '@/components/GoldRateManager';
-import { Coins } from 'lucide-react';
+import { Coins, PlusCircle, Settings, History } from 'lucide-react';
 
 interface Transaction {
   id: string;
@@ -85,47 +86,69 @@ const Index = () => {
         </div>
       </header>
 
-      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <div className="grid grid-cols-1 xl:grid-cols-3 gap-8">
-          {/* Main Dashboard - Full width on smaller screens, 2/3 on xl */}
-          <div className="xl:col-span-3">
-            <Dashboard 
-              transactions={transactions} 
-              currentGoldRate={currentGoldRate}
-            />
+      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8">
+        {/* Dashboard Section - Full Width */}
+        <section>
+          <Dashboard 
+            transactions={transactions} 
+            currentGoldRate={currentGoldRate}
+          />
+        </section>
+
+        {/* Forms and History Section - Two Column Layout */}
+        <section className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+          {/* Left Column - Forms */}
+          <div className="space-y-6">
+            <Card className="bg-card/80 backdrop-blur-sm border-border/50">
+              <CardHeader className="border-b border-border/50">
+                <CardTitle className="text-lg font-semibold text-foreground flex items-center gap-2">
+                  <PlusCircle className="h-5 w-5 text-primary" />
+                  Add New Transaction
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="p-6">
+                <TransactionForm 
+                  onAddTransaction={handleAddTransaction}
+                  currentGoldRate={currentGoldRate}
+                />
+              </CardContent>
+            </Card>
+
+            <Card className="bg-card/80 backdrop-blur-sm border-border/50">
+              <CardHeader className="border-b border-border/50">
+                <CardTitle className="text-lg font-semibold text-foreground flex items-center gap-2">
+                  <Settings className="h-5 w-5 text-primary" />
+                  Gold Rate Management
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="p-6">
+                <GoldRateManager 
+                  currentGoldRate={currentGoldRate}
+                  onUpdateCurrentRate={handleUpdateCurrentRate}
+                />
+              </CardContent>
+            </Card>
           </div>
 
-          {/* Transaction Form and Gold Rate Manager */}
-          <div className="xl:col-span-2 space-y-8">
-            <div className="bg-card/50 backdrop-blur-sm rounded-lg border border-border/50 p-6">
-              <h3 className="text-xl font-semibold mb-4 text-foreground">Add New Transaction</h3>
-              <TransactionForm 
-                onAddTransaction={handleAddTransaction}
-                currentGoldRate={currentGoldRate}
-              />
-            </div>
-
-            <div className="bg-card/50 backdrop-blur-sm rounded-lg border border-border/50 p-6">
-              <h3 className="text-xl font-semibold mb-4 text-foreground">Manage Gold Rates</h3>
-              <GoldRateManager 
-                currentGoldRate={currentGoldRate}
-                onUpdateCurrentRate={handleUpdateCurrentRate}
-              />
-            </div>
+          {/* Right Column - History */}
+          <div>
+            <Card className="bg-card/80 backdrop-blur-sm border-border/50 h-fit">
+              <CardHeader className="border-b border-border/50">
+                <CardTitle className="text-lg font-semibold text-foreground flex items-center gap-2">
+                  <History className="h-5 w-5 text-primary" />
+                  Transaction History
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="p-6">
+                <TransactionHistory 
+                  transactions={transactions}
+                  onDeleteTransaction={handleDeleteTransaction}
+                  onEditTransaction={handleEditTransaction}
+                />
+              </CardContent>
+            </Card>
           </div>
-
-          {/* Transaction History - Sidebar on xl, full width on smaller */}
-          <div className="xl:col-span-1">
-            <div className="bg-card/50 backdrop-blur-sm rounded-lg border border-border/50 p-6 h-fit">
-              <h3 className="text-xl font-semibold mb-4 text-foreground">Transaction History</h3>
-              <TransactionHistory 
-                transactions={transactions}
-                onDeleteTransaction={handleDeleteTransaction}
-                onEditTransaction={handleEditTransaction}
-              />
-            </div>
-          </div>
-        </div>
+        </section>
       </main>
     </div>
   );
