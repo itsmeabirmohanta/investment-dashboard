@@ -66,48 +66,66 @@ const Index = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      <header className="bg-white border-b border-gray-200 sticky top-0 z-10">
+    <div className="min-h-screen bg-gradient-to-br from-background via-muted/30 to-background">
+      <header className="bg-card/80 backdrop-blur-sm border-b border-border/50 sticky top-0 z-10">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between h-16">
             <div className="flex items-center gap-3">
-              <div className="p-2 bg-amber-100 rounded-lg">
-                <Coins className="h-6 w-6 text-amber-600" />
+              <div className="p-2 bg-gradient-to-br from-primary to-chart-2 rounded-lg shadow-sm">
+                <Coins className="h-6 w-6 text-white" />
               </div>
               <div>
-                <h1 className="text-xl font-bold text-gray-900">Gold Investment Tracker</h1>
-                <p className="text-sm text-gray-500">Track your gold purchases and portfolio performance</p>
+                <h1 className="text-xl font-bold bg-gradient-to-r from-primary to-chart-2 bg-clip-text text-transparent">
+                  Gold Investment Tracker
+                </h1>
+                <p className="text-sm text-muted-foreground">Track your gold purchases and portfolio performance</p>
               </div>
             </div>
           </div>
         </div>
       </header>
 
-      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8">
-        {/* Dashboard Section */}
-        <Dashboard 
-          transactions={transactions} 
-          currentGoldRate={currentGoldRate}
-        />
+      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <div className="grid grid-cols-1 xl:grid-cols-3 gap-8">
+          {/* Main Dashboard - Full width on smaller screens, 2/3 on xl */}
+          <div className="xl:col-span-3">
+            <Dashboard 
+              transactions={transactions} 
+              currentGoldRate={currentGoldRate}
+            />
+          </div>
 
-        {/* Add Transaction Section */}
-        <TransactionForm 
-          onAddTransaction={handleAddTransaction}
-          currentGoldRate={currentGoldRate}
-        />
+          {/* Transaction Form and Gold Rate Manager */}
+          <div className="xl:col-span-2 space-y-8">
+            <div className="bg-card/50 backdrop-blur-sm rounded-lg border border-border/50 p-6">
+              <h3 className="text-xl font-semibold mb-4 text-foreground">Add New Transaction</h3>
+              <TransactionForm 
+                onAddTransaction={handleAddTransaction}
+                currentGoldRate={currentGoldRate}
+              />
+            </div>
 
-        {/* Transaction History Section */}
-        <TransactionHistory 
-          transactions={transactions}
-          onDeleteTransaction={handleDeleteTransaction}
-          onEditTransaction={handleEditTransaction}
-        />
+            <div className="bg-card/50 backdrop-blur-sm rounded-lg border border-border/50 p-6">
+              <h3 className="text-xl font-semibold mb-4 text-foreground">Manage Gold Rates</h3>
+              <GoldRateManager 
+                currentGoldRate={currentGoldRate}
+                onUpdateCurrentRate={handleUpdateCurrentRate}
+              />
+            </div>
+          </div>
 
-        {/* Gold Rate Manager Section */}
-        <GoldRateManager 
-          currentGoldRate={currentGoldRate}
-          onUpdateCurrentRate={handleUpdateCurrentRate}
-        />
+          {/* Transaction History - Sidebar on xl, full width on smaller */}
+          <div className="xl:col-span-1">
+            <div className="bg-card/50 backdrop-blur-sm rounded-lg border border-border/50 p-6 h-fit">
+              <h3 className="text-xl font-semibold mb-4 text-foreground">Transaction History</h3>
+              <TransactionHistory 
+                transactions={transactions}
+                onDeleteTransaction={handleDeleteTransaction}
+                onEditTransaction={handleEditTransaction}
+              />
+            </div>
+          </div>
+        </div>
       </main>
     </div>
   );

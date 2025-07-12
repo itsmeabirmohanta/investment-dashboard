@@ -17,7 +17,7 @@ All colors MUST be HSL.
     --popover: 0 0% 100%;
     --popover-foreground: 222.2 84% 4.9%;
 
-    --primary: 222.2 47.4% 11.2%;
+    --primary: 43 74% 49%;
     --primary-foreground: 210 40% 98%;
 
     --secondary: 210 40% 96.1%;
@@ -38,20 +38,26 @@ All colors MUST be HSL.
 
     --radius: 0.5rem;
 
+    /* Gold Investment Theme Colors */
+    --gold-primary: 43 74% 49%;
+    --gold-secondary: 45 86% 58%;
+    --gold-accent: 38 92% 50%;
+    --gold-muted: 48 100% 96%;
+
+    /* Chart Colors */
+    --chart-1: 43 74% 49%;
+    --chart-2: 27 87% 67%;
+    --chart-3: 197 37% 24%;
+    --chart-4: 43 74% 66%;
+    --chart-5: 27 87% 67%;
+
     --sidebar-background: 0 0% 98%;
-
     --sidebar-foreground: 240 5.3% 26.1%;
-
     --sidebar-primary: 240 5.9% 10%;
-
     --sidebar-primary-foreground: 0 0% 98%;
-
     --sidebar-accent: 240 4.8% 95.9%;
-
     --sidebar-accent-foreground: 240 5.9% 10%;
-
     --sidebar-border: 220 13% 91%;
-
     --sidebar-ring: 217.2 91.2% 59.8%;
   }
 
