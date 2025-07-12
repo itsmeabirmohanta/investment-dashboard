@@ -1,6 +1,5 @@
 
 import React, { useState, useEffect } from 'react';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import Dashboard from '@/components/Dashboard';
 import TransactionForm from '@/components/TransactionForm';
 import TransactionHistory from '@/components/TransactionHistory';
@@ -84,44 +83,31 @@ const Index = () => {
         </div>
       </header>
 
-      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <Tabs defaultValue="dashboard" className="space-y-6">
-          <TabsList className="grid w-full grid-cols-4 lg:w-1/2 mx-auto">
-            <TabsTrigger value="dashboard">Dashboard</TabsTrigger>
-            <TabsTrigger value="add">Add Transaction</TabsTrigger>
-            <TabsTrigger value="history">History</TabsTrigger>
-            <TabsTrigger value="rates">Gold Rates</TabsTrigger>
-          </TabsList>
+      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8">
+        {/* Dashboard Section */}
+        <Dashboard 
+          transactions={transactions} 
+          currentGoldRate={currentGoldRate}
+        />
 
-          <TabsContent value="dashboard" className="space-y-6">
-            <Dashboard 
-              transactions={transactions} 
-              currentGoldRate={currentGoldRate}
-            />
-          </TabsContent>
+        {/* Add Transaction Section */}
+        <TransactionForm 
+          onAddTransaction={handleAddTransaction}
+          currentGoldRate={currentGoldRate}
+        />
 
-          <TabsContent value="add" className="space-y-6">
-            <TransactionForm 
-              onAddTransaction={handleAddTransaction}
-              currentGoldRate={currentGoldRate}
-            />
-          </TabsContent>
+        {/* Transaction History Section */}
+        <TransactionHistory 
+          transactions={transactions}
+          onDeleteTransaction={handleDeleteTransaction}
+          onEditTransaction={handleEditTransaction}
+        />
 
-          <TabsContent value="history" className="space-y-6">
-            <TransactionHistory 
-              transactions={transactions}
-              onDeleteTransaction={handleDeleteTransaction}
-              onEditTransaction={handleEditTransaction}
-            />
-          </TabsContent>
-
-          <TabsContent value="rates" className="space-y-6">
-            <GoldRateManager 
-              currentGoldRate={currentGoldRate}
-              onUpdateCurrentRate={handleUpdateCurrentRate}
-            />
-          </TabsContent>
-        </Tabs>
+        {/* Gold Rate Manager Section */}
+        <GoldRateManager 
+          currentGoldRate={currentGoldRate}
+          onUpdateCurrentRate={handleUpdateCurrentRate}
+        />
       </main>
     </div>
   );
