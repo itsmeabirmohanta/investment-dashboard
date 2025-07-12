@@ -6,6 +6,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Plus, Calculator } from 'lucide-react';
 import { toast } from '@/hooks/use-toast';
 
@@ -34,6 +35,8 @@ const TransactionForm: React.FC<TransactionFormProps> = ({ onAddTransaction, cur
     goldPurchased: '',
     notes: '',
   });
+
+  const [goldInputType, setGoldInputType] = useState<'preset' | 'custom'>('preset');
 
   const [calculations, setCalculations] = useState({
     usableAmount: 0,
@@ -101,6 +104,7 @@ const TransactionForm: React.FC<TransactionFormProps> = ({ onAddTransaction, cur
       notes: '',
     });
     setCalculations({ usableAmount: 0, goldCost: 0, leftover: 0 });
+    setGoldInputType('preset');
 
     toast({
       title: "Transaction Added",
@@ -165,21 +169,43 @@ const TransactionForm: React.FC<TransactionFormProps> = ({ onAddTransaction, cur
 
             <div className="space-y-2">
               <Label htmlFor="goldPurchased">Gold Purchased</Label>
-              <Select
-                value={formData.goldPurchased}
-                onValueChange={(value) => handleInputChange('goldPurchased', value)}
-              >
-                <SelectTrigger className="text-lg">
-                  <SelectValue placeholder="Select weight" />
-                </SelectTrigger>
-                <SelectContent>
-                  {standardGoldWeights.map((weight) => (
-                    <SelectItem key={weight} value={weight.toString()}>
-                      {weight} gm
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
+              <Tabs value={goldInputType} onValueChange={(value) => setGoldInputType(value as 'preset' | 'custom')} className="w-full">
+                <TabsList className="grid grid-cols-2 mb-2">
+                  <TabsTrigger value="preset">Preset Values</TabsTrigger>
+                  <TabsTrigger value="custom">Custom Value</TabsTrigger>
+                </TabsList>
+                <TabsContent value="preset" className="mt-0">
+                  <Select
+                    value={formData.goldPurchased}
+                    onValueChange={(value) => handleInputChange('goldPurchased', value)}
+                  >
+                    <SelectTrigger className="text-lg">
+                      <SelectValue placeholder="Select weight" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {standardGoldWeights.map((weight) => (
+                        <SelectItem key={weight} value={weight.toString()}>
+                          {weight} gm
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </TabsContent>
+                <TabsContent value="custom" className="mt-0">
+                  <div className="flex items-center">
+                    <Input
+                      id="customGoldAmount"
+                      type="number"
+                      step="0.01"
+                      value={formData.goldPurchased}
+                      onChange={(e) => handleInputChange('goldPurchased', e.target.value)}
+                      placeholder="Custom weight"
+                      className="text-lg"
+                    />
+                    <span className="ml-2">gm</span>
+                  </div>
+                </TabsContent>
+              </Tabs>
             </div>
           </div>
 
