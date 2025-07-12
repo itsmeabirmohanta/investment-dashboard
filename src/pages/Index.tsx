@@ -176,16 +176,16 @@ const Index = () => {
     <div className="min-h-screen bg-gradient-to-br from-background via-muted/30 to-background">
       <header className="bg-card/80 backdrop-blur-sm border-b border-border/50 sticky top-0 z-10">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex items-center justify-center h-20">
-            <div className="flex items-center gap-4">
+          <div className="flex items-center justify-center h-auto py-4">
+            <div className="flex flex-col sm:flex-row items-center gap-4">
               <div className="p-2.5 bg-gradient-to-br from-primary to-chart-2 rounded-lg shadow-md">
                 <Coins className="h-7 w-7 text-white" />
               </div>
               <div className="text-center">
-                <h1 className="text-2xl font-bold bg-gradient-to-r from-primary to-chart-2 bg-clip-text text-transparent">
+                <h1 className="text-xl sm:text-2xl font-bold bg-gradient-to-r from-primary to-chart-2 bg-clip-text text-transparent">
                   Investment Tracker Dashboard
                 </h1>
-                <p className="text-sm text-muted-foreground">Track your investments and portfolio performance</p>
+                <p className="text-xs sm:text-sm text-muted-foreground">Track your investments and portfolio performance</p>
               </div>
             </div>
           </div>
