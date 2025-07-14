@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { TrendingUp, TrendingDown, Coins, Wallet, PiggyBank, DollarSign, CandlestickChart, BarChart3 } from 'lucide-react';
@@ -127,7 +126,7 @@ const Dashboard: React.FC<DashboardProps> = ({ transactions, currentGoldRate, on
       {/* Header Section */}
       <div className="text-center space-y-2">
         <h2 className="text-3xl font-bold bg-gradient-to-r from-primary to-chart-2 bg-clip-text text-transparent">
-          Portfolio Overview
+          Investment Tracker Dashboard
         </h2>
         <p className="text-muted-foreground">Track your investment portfolio performance and metrics</p>
       </div>
@@ -263,19 +262,19 @@ const Dashboard: React.FC<DashboardProps> = ({ transactions, currentGoldRate, on
                     }}
                   />
                   <Area 
-                    type="monotone" 
-                    dataKey="invested" 
-                    stackId="1" 
-                    stroke="hsl(var(--primary))" 
-                    fill="hsl(var(--primary) / 0.1)" 
+                    type="monotone"
+                    dataKey="invested"
+                    stackId="1"
+                    stroke="hsl(var(--primary))"
+                    fill="hsl(var(--primary)/20)"
                     name="Invested"
                   />
                   <Area 
-                    type="monotone" 
-                    dataKey="currentValue" 
+                    type="monotone"
+                    dataKey="currentValue"
                     stackId="2" 
-                    stroke="hsl(var(--chart-2))" 
-                    fill="hsl(var(--chart-2) / 0.1)" 
+                    stroke="hsl(var(--chart-2))"
+                    fill="hsl(var(--chart-2)/20)"
                     name="Current Value"
                   />
                 </AreaChart>
@@ -283,125 +282,83 @@ const Dashboard: React.FC<DashboardProps> = ({ transactions, currentGoldRate, on
             </CardContent>
           </Card>
 
-          {/* Gold Purchase Timeline */}
-          {transactions.length >= 2 ? (
-            <Card>
-              <CardHeader>
-                <CardTitle className="text-lg">Gold Purchase Timeline</CardTitle>
-                <p className="text-sm text-muted-foreground">Gold amount purchased at each transaction</p>
-              </CardHeader>
-              <CardContent>
-                <ResponsiveContainer width="100%" height={300}>
-                  <BarChart data={transactions.map(t => ({
-                    date: new Date(t.date).toLocaleDateString('en-IN', { month: 'short', year: '2-digit', day: 'numeric' }),
-                    goldPurchased: t.goldPurchased,
-                    goldRate: t.goldRate
-                  }))}>
-                    <CartesianGrid strokeDasharray="3 3" className="stroke-muted" />
-                    <XAxis 
-                      dataKey="date" 
-                      className="text-xs"
-                      tick={{ fill: 'hsl(var(--muted-foreground))' }}
-                    />
-                    <YAxis 
-                      className="text-xs"
-                      yAxisId="left"
-                      orientation="left"
-                      tick={{ fill: 'hsl(var(--muted-foreground))' }}
-                      tickFormatter={(value) => `${value.toFixed(2)} gm`}
-                    />
-                    <YAxis 
-                      className="text-xs"
-                      yAxisId="right"
-                      orientation="right"
-                      tick={{ fill: 'hsl(var(--amber-600))' }}
-                      tickFormatter={(value) => `₹${(value / 1000).toFixed(0)}k`}
-                    />
-                    <Tooltip 
-                      formatter={(value, name, props) => {
-                        if (name === 'goldPurchased') return [`${Number(value).toFixed(2)} gm`, 'Gold Purchased'];
-                        if (name === 'goldRate') return [formatCurrency(Number(value)), 'Gold Rate'];
-                        return [value, name];
-                      }}
-                      labelStyle={{ color: 'hsl(var(--foreground))' }}
-                      contentStyle={{ 
-                        backgroundColor: 'hsl(var(--background))',
-                        border: '1px solid hsl(var(--border))',
-                        borderRadius: 'var(--radius)'
-                      }}
-                    />
-                    <Bar 
-                      dataKey="goldPurchased" 
-                      yAxisId="left"
-                      fill="hsl(var(--chart-2) / 0.8)" 
-                      name="Gold Purchased"
-                    />
-                    <Line 
-                      type="monotone" 
-                      dataKey="goldRate" 
-                      yAxisId="right"
-                      stroke="hsl(var(--amber-600))" 
-                      strokeWidth={2}
-                      name="Gold Rate"
-                    />
-                  </BarChart>
-                </ResponsiveContainer>
-              </CardContent>
-            </Card>
-          ) : transactions.length === 1 && (
-            <Card>
-              <CardHeader>
-                <CardTitle className="text-lg">Detailed Analysis</CardTitle>
-                <p className="text-sm text-muted-foreground">Add more transactions to see additional insights</p>
-              </CardHeader>
-              <CardContent className="flex items-center justify-center py-12">
-                <div className="text-center space-y-3">
-                  <BarChart3 className="h-12 w-12 text-muted-foreground mx-auto" />
-                  <h3 className="text-xl font-medium">More Data Needed</h3>
-                  <p className="text-muted-foreground max-w-md">
-                    Add at least one more transaction to view purchase timeline analysis.
-                  </p>
-                </div>
-              </CardContent>
-            </Card>
-          )}
+          {/* Gold Rate Chart */}
+          <Card>
+            <CardHeader>
+              <CardTitle className="text-lg">Gold Rate History</CardTitle>
+              <p className="text-sm text-muted-foreground">Historical gold rates at purchase times</p>
+            </CardHeader>
+            <CardContent>
+              <ResponsiveContainer width="100%" height={300}>
+                <BarChart data={goldRateData}>
+                  <CartesianGrid strokeDasharray="3 3" className="stroke-muted" />
+                  <XAxis 
+                    dataKey="date" 
+                    className="text-xs"
+                    tick={{ fill: 'hsl(var(--muted-foreground))' }}
+                  />
+                  <YAxis 
+                    className="text-xs"
+                    tick={{ fill: 'hsl(var(--muted-foreground))' }}
+                    tickFormatter={(value) => `₹${value.toLocaleString('en-IN')}`}
+                  />
+                  <Tooltip 
+                    formatter={(value, name) => {
+                      if (name === 'rate') return [formatCurrency(Number(value)), 'Rate'];
+                      return [value + ' gm', 'Amount'];
+                    }}
+                    labelStyle={{ color: 'hsl(var(--foreground))' }}
+                    contentStyle={{ 
+                      backgroundColor: 'hsl(var(--background))',
+                      border: '1px solid hsl(var(--border))',
+                      borderRadius: 'var(--radius)'
+                    }}
+                  />
+                  <ReferenceLine 
+                    y={currentGoldRate} 
+                    label={{ 
+                      value: 'Current', 
+                      position: 'insideTopRight',
+                      fill: 'hsl(var(--amber-600))'
+                    }}
+                    stroke="hsl(var(--amber-500))" 
+                    strokeDasharray="3 3" 
+                  />
+                  <Bar 
+                    dataKey="rate" 
+                    fill="hsl(var(--amber-500))" 
+                    name="Gold Rate" 
+                    radius={[4, 4, 0, 0]}
+                  />
+                </BarChart>
+              </ResponsiveContainer>
+            </CardContent>
+          </Card>
         </div>
       )}
 
-      {/* No Transactions Message */}
-      {transactions.length === 0 && (
-        <Card className="bg-muted/30">
-          <CardContent className="py-8">
-            <div className="text-center space-y-3">
-              <Coins className="h-12 w-12 text-muted-foreground mx-auto" />
-              <h3 className="text-xl font-medium">No Transactions Yet</h3>
-              <p className="text-muted-foreground max-w-md mx-auto">
-                Add your first transaction to start tracking your gold investments and see performance charts.
-              </p>
-            </div>
-          </CardContent>
-        </Card>
-      )}
-
-      {/* Gold Rate Update Dialog */}
+      {/* Rate Update Dialog */}
       <Dialog open={openRateDialog} onOpenChange={setOpenRateDialog}>
         <DialogContent>
           <DialogHeader>
             <DialogTitle>Update Gold Rate</DialogTitle>
             <DialogDescription>
-              Set the current market price for gold per gram.
+              Enter the current market rate of gold per gram.
             </DialogDescription>
           </DialogHeader>
           <form onSubmit={handleUpdateRate}>
-            <div className="space-y-4 py-4">
-              <div className="space-y-2">
-                <Label htmlFor="goldRate">Current Gold Rate (₹/gm)</Label>
+            <div className="grid gap-4 py-4">
+              <div className="grid gap-2">
+                <Label htmlFor="gold-rate">Gold Rate (₹/gm)</Label>
                 <Input
-                  id="goldRate"
+                  id="gold-rate"
                   type="number"
+                  min="1"
+                  step="0.01"
                   value={newRate}
                   onChange={(e) => setNewRate(e.target.value)}
-                  placeholder="Enter rate"
+                  placeholder="Enter current gold rate"
+                  className="col-span-3"
                 />
               </div>
             </div>
@@ -416,6 +373,6 @@ const Dashboard: React.FC<DashboardProps> = ({ transactions, currentGoldRate, on
       </Dialog>
     </div>
   );
-};
+}
 
 export default Dashboard;
