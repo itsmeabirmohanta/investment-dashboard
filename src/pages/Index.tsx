@@ -1,14 +1,25 @@
-
 import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import Dashboard from '@/components/Dashboard';
 import TransactionForm from '@/components/TransactionForm';
 import TransactionHistory from '@/components/TransactionHistory';
 import FirebaseSetupGuide from '@/components/FirebaseSetupGuide';
+import { Header } from '@/components/Header';
+import { DataMigrationDialog } from '@/components/DataMigrationDialog';
 import { Coins, PlusCircle, History } from 'lucide-react';
-import { fetchTransactions, addTransaction, deleteTransaction, updateTransaction, fetchCurrentGoldRate, updateCurrentGoldRate } from '@/lib/firebaseService';
+import { 
+  fetchTransactions, 
+  addTransaction, 
+  deleteTransaction, 
+  updateTransaction, 
+  fetchCurrentGoldRate, 
+  updateCurrentGoldRate,
+  checkForLegacyData,
+  migrateUserData 
+} from '@/lib/firebaseService';
 import { isConfigValid } from '@/lib/firebase';
 import { toast } from '@/hooks/use-toast';
+import { useAuth } from '@/context/AuthContext';
 
 interface Transaction {
   id: string;
@@ -24,34 +35,97 @@ const Index = () => {
   const [transactions, setTransactions] = useState<Transaction[]>([]);
   const [currentGoldRate, setCurrentGoldRate] = useState(7500);
   const [loading, setLoading] = useState(true);
+  const [showMigration, setShowMigration] = useState(false);
+  const { currentUser } = useAuth();
+
+  // Check for legacy data that needs migration
+  useEffect(() => {
+    const checkLegacyData = async () => {
+      if (isConfigValid && currentUser) {
+        try {
+          const hasLegacyData = await checkForLegacyData();
+          if (hasLegacyData) {
+            setShowMigration(true);
+          }
+        } catch (error) {
+          console.error("Error checking for legacy data:", error);
+        }
+      }
+    };
+    
+    checkLegacyData();
+  }, [currentUser]);
 
   // Load data from Firebase on component mount (only if config is valid)
   useEffect(() => {
     const loadData = async () => {
       if (!isConfigValid) {
+        console.warn("Firebase configuration is not valid. Skipping data loading.");
+        setLoading(false);
+        return;
+      }
+
+      if (!currentUser) {
+        console.error("No authenticated user found.");
+        toast({
+          title: "Authentication Error",
+          description: "Please log in to access your data.",
+          variant: "destructive",
+        });
         setLoading(false);
         return;
       }
 
       setLoading(true);
       try {
-        // Fetch transactions
-        const fetchedTransactions = await fetchTransactions();
-        setTransactions(fetchedTransactions);
+        console.log("Starting to load data with user:", currentUser.uid);
         
-        // Fetch current gold rate
-        const rate = await fetchCurrentGoldRate();
-        if (rate !== null) {
-          setCurrentGoldRate(rate);
-        } else {
-          // If no rate is stored yet, initialize it in Firebase
-          await updateCurrentGoldRate(currentGoldRate);
+        // First try to fetch transactions
+        try {
+          console.log("Attempting to fetch transactions...");
+          const fetchedTransactions = await fetchTransactions();
+          console.log("Transactions loaded successfully:", fetchedTransactions.length);
+          setTransactions(fetchedTransactions);
+        } catch (error: any) {
+          console.error("Error fetching transactions:", error);
+          // Show more specific error message based on the error
+          toast({
+            title: "Failed to Load Transactions",
+            description: error?.message || "Could not retrieve your transaction history.",
+            variant: "destructive",
+          });
+          
+          // If there's an authentication error specifically, we should stop
+          if (error.message?.includes("authentication") || error.message?.includes("log in")) {
+            setLoading(false);
+            return;
+          }
         }
-      } catch (error) {
+
+        // Then try to fetch the current gold rate
+        try {
+          console.log("Attempting to fetch gold rate...");
+          const rate = await fetchCurrentGoldRate();
+          if (rate !== null) {
+            setCurrentGoldRate(rate);
+            console.log("Gold rate loaded successfully:", rate);
+          } else {
+            console.log("No existing gold rate found, setting default");
+            await updateCurrentGoldRate(currentGoldRate);
+          }
+        } catch (goldRateError: any) {
+          console.error("Error fetching gold rate:", goldRateError);
+          toast({
+            title: "Failed to Load Gold Rate",
+            description: goldRateError?.message || "Could not retrieve the current gold rate.",
+            variant: "destructive",
+          });
+        }
+      } catch (error: any) {
         console.error("Error loading data:", error);
         toast({
-          title: "Failed to load data",
-          description: "There was an error loading your data from the database.",
+          title: "Failed to Load Data",
+          description: error?.message || "An error occurred while fetching data from the server.",
           variant: "destructive",
         });
       } finally {
@@ -59,8 +133,12 @@ const Index = () => {
       }
     };
 
-    loadData();
-  }, []);
+    if (currentUser) {
+      loadData();
+    } else {
+      setLoading(false);
+    }
+  }, [currentUser]);
 
   const handleAddTransaction = async (newTransaction: Omit<Transaction, 'id'>) => {
     try {
@@ -141,6 +219,21 @@ const Index = () => {
     }
   };
 
+  const handleMigrateData = async () => {
+    try {
+      const success = await migrateUserData();
+      if (success) {
+        // Reload transactions after migration
+        const fetchedTransactions = await fetchTransactions();
+        setTransactions(fetchedTransactions);
+      }
+      return success;
+    } catch (error) {
+      console.error("Migration error:", error);
+      return false;
+    }
+  };
+
   // Show Firebase setup guide if configuration is not valid
   if (!isConfigValid) {
     return (
@@ -174,23 +267,7 @@ const Index = () => {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-background via-muted/30 to-background">
-      <header className="bg-card/80 backdrop-blur-sm border-b border-border/50 sticky top-0 z-10">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex items-center justify-center h-auto py-4">
-            <div className="flex flex-col sm:flex-row items-center gap-4">
-              <div className="p-2.5 bg-gradient-to-br from-primary to-chart-2 rounded-lg shadow-md">
-                <Coins className="h-7 w-7 text-white" />
-              </div>
-              <div className="text-center">
-                <h1 className="text-xl sm:text-2xl font-bold bg-gradient-to-r from-primary to-chart-2 bg-clip-text text-transparent">
-                  Investment Tracker Dashboard
-                </h1>
-                <p className="text-xs sm:text-sm text-muted-foreground">Track your investments and portfolio performance</p>
-              </div>
-            </div>
-          </div>
-        </div>
-      </header>
+      <Header />
 
       <main className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8">
         {/* Dashboard Section - Full Width */}
@@ -242,6 +319,13 @@ const Index = () => {
           </div>
         </section>
       </main>
+
+      {/* Data Migration Dialog */}
+      <DataMigrationDialog
+        isOpen={showMigration}
+        onClose={() => setShowMigration(false)}
+        migrateData={handleMigrateData}
+      />
     </div>
   );
 };

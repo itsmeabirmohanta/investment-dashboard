@@ -2,6 +2,8 @@
 import { initializeApp } from "firebase/app";
 import { getFirestore } from "firebase/firestore";
 import { getAnalytics } from "firebase/analytics";
+import { getAuth, GoogleAuthProvider, updateProfile } from "firebase/auth";
+import { doc, setDoc } from "firebase/firestore";
 
 // Your web app's Firebase configuration
 // Using environment variables for security
@@ -38,6 +40,8 @@ console.log("Is Firebase config valid:", isConfigValid);
 let app;
 let db;
 let analytics;
+let auth;
+const googleProvider = new GoogleAuthProvider();
 
 if (isConfigValid) {
   // Initialize Firebase
@@ -47,6 +51,9 @@ if (isConfigValid) {
     // Initialize Firestore
     db = getFirestore(app);
     console.log("Firestore initialized successfully");
+    // Initialize Auth
+    auth = getAuth(app);
+    console.log("Authentication initialized successfully");
     // Initialize Analytics if in browser environment
     if (typeof window !== 'undefined') {
       analytics = getAnalytics(app);
@@ -59,4 +66,17 @@ if (isConfigValid) {
   console.error("Firebase configuration is invalid. Check your .env file.");
 }
 
-export { db, analytics, isConfigValid }; 
+// Function to add username and password for a logged-in user
+async function addUsernameAndPassword(userId: string, username: string, password: string) {
+  try {
+    // Update Firestore with username and password
+    const userDocRef = doc(db, "users", userId);
+    await setDoc(userDocRef, { username, password }, { merge: true });
+    console.log("Username and password added successfully.");
+  } catch (error) {
+    console.error("Error adding username and password:", error);
+    throw error;
+  }
+}
+
+export { db, analytics, auth, isConfigValid, googleProvider, addUsernameAndPassword };
