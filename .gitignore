@@ -45,6 +45,8 @@ aws-credentials.json
 .Trashes
 ehthumbs.db
 Thumbs.db
+desktop.ini
+*.lnk
 
 # Logs
 logs/
@@ -137,6 +139,31 @@ TODO_PRIVATE.md
 secrets.txt
 passwords.txt
 credentials.txt
+
+# Device and system specific files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+desktop.ini
+*.lnk
+
+# User specific files
+.vscode/settings.json
+.vscode/launch.json
+.vscode/tasks.json
+.vscode/c_cpp_properties.json
+.vscode/extensions.json
+*.code-workspace
+
+# System and device information
+system-info.txt
+device-info.json
+computer-details.md
+hardware-info.log
 
 # Backup files
 *.bak
