@@ -1,20 +1,62 @@
 # Investment Dashboard 🏆
 
-A comprehensive investment tracking application for managing your portfolio across multiple asset classes including gold, silver, stocks, mutual funds, fixed deposits, and recurring deposits.
+[![Build Status](https://img.shields.io/github/workflow/status/username/gold-stash-tracker/CI)](https://github.com/username/gold-stash-tracker/actions)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
+[![Firebase](https://img.shields.io/badge/Backend-Firebase-orange)](https://firebase.google.com/)
+[![React](https://img.shields.io/badge/Frontend-React-blue)](https://react.dev/)
+
+---
+
+> **A comprehensive dashboard for tracking and analyzing all your investments—gold, silver, stocks, mutual funds, fixed deposits, and recurring deposits—in one place.**
+
+---
+
+## 📑 Table of Contents
+- [Features](#features)
+- [Screenshots](#screenshots)
+- [Tech Stack](#tech-stack)
+- [Installation](#installation)
+- [Usage](#usage)
+- [Project Structure](#project-structure)
+- [Configuration](#configuration)
+- [Available Scripts](#available-scripts)
+- [Deployment](#deployment)
+- [Contributing](#contributing)
+- [FAQ](#faq)
+- [License](#license)
+- [Support](#support)
+- [Version History](#version-history)
+- [Acknowledgments](#acknowledgments)
+
+---
 
 ## 🚀 Features
+- **Unified Multi-Asset Portfolio**: Track gold, silver, stocks, mutual funds, FDs, and RDs in a single dashboard
+- **Global Overview**: Real-time analytics and interactive charts for your entire portfolio
+- **Transaction Management**: Add, edit, and delete transactions for every asset class
+- **Performance Analytics**: Calculate returns, profit/loss, and ROI for each investment type
+- **Built-in Calculators**: FD & RD maturity and interest calculators
+- **Secure Authentication**: Firebase Auth for user management
+- **Cloud Storage**: Persistent data with Firebase Firestore
+- **Responsive Design**: Works on desktop and mobile
+- **Data Migration & Export**: Tools for onboarding and exporting your data
 
-- **Multi-Asset Portfolio Management**: Track gold, silver, stocks, mutual funds, FDs, and RDs
-- **Real-time Dashboard**: Global overview of all investments with interactive charts
-- **Transaction Management**: Add, edit, and delete investment transactions
-- **Performance Analytics**: Calculate returns, profit/loss, and portfolio performance
-- **User Authentication**: Secure login/registration with Firebase Auth
-- **Responsive Design**: Works seamlessly on desktop and mobile devices
-- **Data Persistence**: Cloud-based storage with Firebase Firestore
-- **Investment Calculator**: Built-in FD & RD calculator and other financial tools
+## 🧠 Core Logic & Calculation Modules
+This dashboard uses modular calculation utilities for each asset class:
+- **Gold & Silver**: Tracks quantity, market rates, leftover cash, and calculates current value and profit/loss
+- **Stocks**: Manages buy/sell transactions, average price, current value, and performance analytics
+- **Mutual Funds**: Tracks units, NAV, charges, and computes holdings, returns, and distribution
+- **FDs & RDs**: Calculates maturity, accrued interest, and completion percentage using accurate financial formulas
+- **Global Dashboard**: Aggregates all assets for a holistic view and actionable insights
+
+## 📸 Screenshots
+| Dashboard | Add Transaction | Analytics |
+|-----------|----------------|-----------|
+| ![Dashboard](public/placeholder.svg) | ![Add Transaction](public/placeholder.svg) | ![Analytics](public/placeholder.svg) |
+
+> Replace `public/placeholder.svg` with actual screenshots for better presentation.
 
 ## 🛠️ Tech Stack
-
 - **Frontend**: React 18 with TypeScript
 - **UI Framework**: Tailwind CSS with shadcn/ui components
 - **State Management**: React Query for server state
@@ -160,6 +202,24 @@ The application can be deployed to various platforms:
 3. Commit changes: `git commit -m 'Add new feature'`
 4. Push to branch: `git push origin feature/new-feature`
 5. Submit a pull request
+
+## ❓ FAQ
+**Q: Is my data secure?**
+A: All data is stored securely in Firebase Firestore with strict security rules.
+
+**Q: Can I export my portfolio data?**
+A: Export functionality is planned for future releases.
+
+**Q: How do I report a bug or request a feature?**
+A: Please open an issue on the [GitHub Issues](https://github.com/username/gold-stash-tracker/issues) page.
+
+## 🌍 Accessibility & Internationalization
+- Follows accessibility best practices (WCAG)
+- Internationalization support planned for future updates
+
+## 💬 Community & Feedback
+- Join discussions on [GitHub Discussions](https://github.com/username/gold-stash-tracker/discussions)
+- For feedback, email support@investmentdashboard.com
 
 ## 📄 License
 

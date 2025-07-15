@@ -1,1 +1,5 @@
- 
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
+  <circle cx="32" cy="32" r="28" fill="#FFD700" stroke="#B8860B" stroke-width="4"/>
+  <circle cx="32" cy="32" r="20" fill="#FFF8DC" opacity="0.5"/>
+  <text x="32" y="40" text-anchor="middle" font-size="20" font-family="Arial" fill="#B8860B" font-weight="bold">₹</text>
+</svg>
