@@ -17,6 +17,18 @@ build/
 .env.development.local
 .env.test.local
 .env.production.local
+.env.example
+
+# Personal and sensitive files
+config/secrets.json
+config/private.json
+*.key
+*.pem
+*.p12
+*.pfx
+service-account-key.json
+google-credentials.json
+aws-credentials.json
 
 # IDE and editor files
 .vscode/
@@ -102,6 +114,7 @@ temp/
 .firebaserc
 firebase-debug.log
 firebase-debug.*.log
+firebase-adminsdk-*.json
 
 # Vercel
 .vercel
@@ -117,3 +130,16 @@ firebase-debug.*.log
 
 # Vite
 vite.config.ts.timestamp-*
+
+# Personal notes and documentation
+PERSONAL_NOTES.md
+TODO_PRIVATE.md
+secrets.txt
+passwords.txt
+credentials.txt
+
+# Backup files
+*.bak
+*.backup
+*.orig
+*~
