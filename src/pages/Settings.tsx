@@ -9,7 +9,6 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { Label } from "@/components/ui/label";
 import { AlertCircle } from "lucide-react";
 import { Alert, AlertDescription } from "@/components/ui/alert";
-import { useToast } from "@/components/ui/use-toast";
 import { addUsernameAndPassword } from "@/lib/firebase";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Separator } from "@/components/ui/separator";
@@ -23,7 +22,6 @@ export default function Settings() {
   const [password, setPassword] = useState("");
   const [message, setMessage] = useState("");
   const navigate = useNavigate();
-  const { toast } = useToast();
   const [theme, setTheme] = useState("light");
 
   useEffect(() => {
@@ -62,10 +60,7 @@ export default function Settings() {
       setError("");
       setUpdateLoading(true);
       await updateUserProfile(displayName);
-      toast({
-        title: "Profile updated",
-        description: "Your profile has been updated successfully",
-      });
+      setMessage("Profile updated successfully");
     } catch (err: unknown) {
       console.error("Update profile error:", err);
       setError(getAuthErrorMessage(err));
@@ -93,10 +88,6 @@ export default function Settings() {
     try {
       await addUsernameAndPassword(currentUser.uid, username, password);
       setMessage("Username and password added successfully.");
-      toast({
-        title: "Credentials Updated",
-        description: "Username and password added successfully",
-      });
     } catch (error) {
       setMessage("Failed to add username and password.");
     }
@@ -104,10 +95,7 @@ export default function Settings() {
 
   const handleThemeChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     setTheme(e.target.value);
-    toast({
-      title: "Theme Updated",
-      description: `Theme changed to ${e.target.value}`,
-    });
+    setMessage(`Theme changed to ${e.target.value}`);
   };
 
   return (
@@ -160,6 +148,7 @@ export default function Settings() {
                   </Button>
                 </div>
               </form>
+              {message && <p className="mt-2 text-center">{message}</p>}
             </CardContent>
           </Card>
         </TabsContent>

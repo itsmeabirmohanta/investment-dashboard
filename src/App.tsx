@@ -1,6 +1,4 @@
 import { Suspense, lazy } from "react";
-import { Toaster } from "@/components/ui/toaster";
-import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
@@ -15,6 +13,15 @@ const Profile = lazy(() => import("./pages/Profile"));
 const Settings = lazy(() => import("./pages/Settings"));
 const NotFound = lazy(() => import("./pages/NotFound"));
 
+// Investment Dashboard imports
+const GlobalDashboard = lazy(() => import("./dashboard/GlobalDashboard"));
+const GoldDashboard = lazy(() => import("./gold/GoldDashboard"));
+const SilverDashboard = lazy(() => import("./silver/SilverDashboard"));
+const FDDashboard = lazy(() => import("./fd/FDDashboard"));
+const RDDashboard = lazy(() => import("./rd/RDDashboard"));
+const StocksDashboard = lazy(() => import("./stocks/StocksDashboard"));
+const MutualFundsDashboard = lazy(() => import("./mutualfunds/MutualFundsDashboard"));
+
 // Loading fallback component
 const LoadingFallback = () => (
   <div className="flex items-center justify-center h-screen">
@@ -28,8 +35,6 @@ const App = () => (
   <QueryClientProvider client={queryClient}>
     <AuthProvider>
       <TooltipProvider>
-        <Toaster />
-        <Sonner />
         <BrowserRouter>
           <Suspense fallback={<LoadingFallback />}>
             <Routes>
@@ -40,9 +45,61 @@ const App = () => (
               {/* Protected routes */}
               <Route path="/" element={
                 <ProtectedRoute>
+                  <GlobalDashboard />
+                </ProtectedRoute>
+              } />
+              
+              {/* Legacy Gold Dashboard (preserve existing functionality) */}
+              <Route path="/legacy-gold" element={
+                <ProtectedRoute>
                   <Index />
                 </ProtectedRoute>
               } />
+              
+              {/* New Investment Module Routes */}
+              <Route path="/dashboard" element={
+                <ProtectedRoute>
+                  <GlobalDashboard />
+                </ProtectedRoute>
+              } />
+              
+              <Route path="/gold" element={
+                <ProtectedRoute>
+                  <GoldDashboard />
+                </ProtectedRoute>
+              } />
+              
+              <Route path="/silver" element={
+                <ProtectedRoute>
+                  <SilverDashboard />
+                </ProtectedRoute>
+              } />
+              
+              <Route path="/fd" element={
+                <ProtectedRoute>
+                  <FDDashboard />
+                </ProtectedRoute>
+              } />
+              
+              <Route path="/rd" element={
+                <ProtectedRoute>
+                  <RDDashboard />
+                </ProtectedRoute>
+              } />
+              
+              <Route path="/stocks" element={
+                <ProtectedRoute>
+                  <StocksDashboard />
+                </ProtectedRoute>
+              } />
+              
+              <Route path="/mutual-funds" element={
+                <ProtectedRoute>
+                  <MutualFundsDashboard />
+                </ProtectedRoute>
+              } />
+              
+              {/* User Management Routes */}
               <Route path="/profile" element={
                 <ProtectedRoute>
                   <Profile />

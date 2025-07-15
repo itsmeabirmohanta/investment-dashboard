@@ -1,7 +1,28 @@
 {
-  "name": "vite_react_shadcn_ts",
+  "name": "investment-dashboard",
+  "displayName": "Investment Dashboard",
   "private": true,
-  "version": "0.0.0",
+  "version": "1.0.0",
+  "description": "A comprehensive investment tracking application for gold, silver, stocks, mutual funds, and other financial instruments",
+  "author": "Abir Mahanta",
+  "keywords": [
+    "investment",
+    "dashboard",
+    "tracker",
+    "gold",
+    "silver",
+    "stocks",
+    "mutual-funds",
+    "portfolio",
+    "firebase",
+    "react",
+    "typescript"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/username/investment-dashboard"
+  },
+  "license": "MIT",
   "type": "module",
   "scripts": {
     "dev": "vite",

@@ -8,7 +8,6 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { useToast } from "@/components/ui/use-toast";
 import { AlertCircle, CheckCircle2, Loader2 } from "lucide-react";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 
@@ -26,7 +25,6 @@ export function DataMigrationDialog({
   const [migrating, setMigrating] = useState(false);
   const [error, setError] = useState("");
   const [success, setSuccess] = useState(false);
-  const { toast } = useToast();
 
   const handleMigration = async () => {
     setMigrating(true);
@@ -36,10 +34,6 @@ export function DataMigrationDialog({
       const result = await migrateData();
       if (result) {
         setSuccess(true);
-        toast({
-          title: "Data migration successful",
-          description: "Your data has been successfully migrated to your account",
-        });
         setTimeout(() => {
           onClose();
         }, 2000);
@@ -102,4 +96,4 @@ export function DataMigrationDialog({
       </DialogContent>
     </Dialog>
   );
-} 
+}

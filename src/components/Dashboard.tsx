@@ -13,7 +13,6 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { toast } from '@/hooks/use-toast';
 
 interface Transaction {
   id: string;
@@ -64,19 +63,10 @@ const Dashboard: React.FC<DashboardProps> = ({ transactions, currentGoldRate, on
     const rate = parseFloat(newRate);
     
     if (!rate || rate <= 0) {
-      toast({
-        title: "Invalid Rate",
-        description: "Please enter a valid gold rate.",
-        variant: "destructive",
-      });
       return;
     }
 
     onUpdateCurrentRate(rate);
-    toast({
-      title: "Gold Rate Updated",
-      description: `Current gold rate set to ₹${rate.toLocaleString('en-IN')}/gm`,
-    });
     setOpenRateDialog(false);
   };
 

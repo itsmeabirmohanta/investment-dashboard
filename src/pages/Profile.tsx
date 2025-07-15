@@ -9,7 +9,6 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { Label } from "@/components/ui/label";
 import { AlertCircle } from "lucide-react";
 import { Alert, AlertDescription } from "@/components/ui/alert";
-import { useToast } from "@/components/ui/use-toast";
 import { addUsernameAndPassword } from "@/lib/firebase";
 
 export default function Profile() {
@@ -21,7 +20,6 @@ export default function Profile() {
   const [password, setPassword] = useState("");
   const [message, setMessage] = useState("");
   const navigate = useNavigate();
-  const { toast } = useToast();
 
   useEffect(() => {
     // Update display name when currentUser changes
@@ -59,10 +57,7 @@ export default function Profile() {
       setError("");
       setUpdateLoading(true);
       await updateUserProfile(displayName);
-      toast({
-        title: "Profile updated",
-        description: "Your profile has been updated successfully",
-      });
+      setMessage("Profile updated successfully");
     } catch (err: unknown) {
       console.error("Update profile error:", err);
       setError(getAuthErrorMessage(err));

@@ -4,6 +4,10 @@ import { FirebaseError } from "firebase/app";
 export const getAuthErrorMessage = (error: unknown): string => {
   if (error instanceof FirebaseError) {
     switch (error.code) {
+      // Admin Restricted Operations
+      case 'auth/admin-restricted-operation':
+        return 'This authentication method is disabled in your Firebase project. Please enable Email/Password authentication in Firebase Console under Authentication > Sign-in method.';
+      
       // Email/Password Authentication Errors
       case 'auth/email-already-in-use':
         return 'This email is already in use. Please use a different email or sign in.';
@@ -44,4 +48,4 @@ export const getAuthErrorMessage = (error: unknown): string => {
   
   // If not a Firebase error, return a generic message
   return 'An error occurred. Please try again.';
-}; 
+};

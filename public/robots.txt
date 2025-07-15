@@ -12,3 +12,27 @@ Allow: /
 
 User-agent: *
 Allow: /
+
+# Sitemap
+Sitemap: https://your-domain.com/sitemap.xml
+
+# Disallow sensitive areas
+Disallow: /admin/
+Disallow: /api/
+Disallow: /.env
+Disallow: /firebase-debug.log
+
+# Allow important pages
+Allow: /
+Allow: /login
+Allow: /register
+Allow: /dashboard
+Allow: /gold
+Allow: /silver
+Allow: /stocks
+Allow: /mutual-funds
+Allow: /fd
+Allow: /rd
+
+# Crawl delay
+Crawl-delay: 1

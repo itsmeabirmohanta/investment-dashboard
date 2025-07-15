@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -33,6 +32,7 @@ const TransactionForm: React.FC<TransactionFormProps> = ({ onAddTransaction, cur
     goldRate: currentGoldRate.toString(),
     taxAmount: '',
     goldPurchased: '',
+    date: new Date().toISOString().split('T')[0], // Default to today
     notes: '',
   });
 
@@ -85,7 +85,7 @@ const TransactionForm: React.FC<TransactionFormProps> = ({ onAddTransaction, cur
     }
 
     const transaction = {
-      date: new Date().toISOString(),
+      date: formData.date,
       amountSent,
       goldRate,
       taxAmount,
@@ -101,6 +101,7 @@ const TransactionForm: React.FC<TransactionFormProps> = ({ onAddTransaction, cur
       goldRate: currentGoldRate.toString(),
       taxAmount: '',
       goldPurchased: '',
+      date: new Date().toISOString().split('T')[0], // Reset to today
       notes: '',
     });
     setCalculations({ usableAmount: 0, goldCost: 0, leftover: 0 });
@@ -139,6 +140,18 @@ const TransactionForm: React.FC<TransactionFormProps> = ({ onAddTransaction, cur
                 value={formData.amountSent}
                 onChange={(e) => handleInputChange('amountSent', e.target.value)}
                 placeholder="10000"
+                className="text-lg"
+              />
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="date">Transaction Date</Label>
+              <Input
+                id="date"
+                type="date"
+                value={formData.date}
+                onChange={(e) => handleInputChange('date', e.target.value)}
+                max={new Date().toISOString().split('T')[0]} // Prevent future dates
                 className="text-lg"
               />
             </div>

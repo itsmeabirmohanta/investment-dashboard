@@ -1,100 +1,186 @@
-# Welcome to your Lovable project
+# Investment Dashboard 🏆
 
-## Project info
+A comprehensive investment tracking application for managing your portfolio across multiple asset classes including gold, silver, stocks, mutual funds, fixed deposits, and recurring deposits.
 
-**URL**: https://lovable.dev/projects/ce001853-2c7f-4a73-b58d-9608e3f60eaf
+## 🚀 Features
 
-## How can I edit this code?
+- **Multi-Asset Portfolio Management**: Track gold, silver, stocks, mutual funds, FDs, and RDs
+- **Real-time Dashboard**: Global overview of all investments with interactive charts
+- **Transaction Management**: Add, edit, and delete investment transactions
+- **Performance Analytics**: Calculate returns, profit/loss, and portfolio performance
+- **User Authentication**: Secure login/registration with Firebase Auth
+- **Responsive Design**: Works seamlessly on desktop and mobile devices
+- **Data Persistence**: Cloud-based storage with Firebase Firestore
+- **Investment Calculator**: Built-in FD & RD calculator and other financial tools
 
-There are several ways of editing your application.
+## 🛠️ Tech Stack
 
-**Use Lovable**
+- **Frontend**: React 18 with TypeScript
+- **UI Framework**: Tailwind CSS with shadcn/ui components
+- **State Management**: React Query for server state
+- **Authentication**: Firebase Authentication
+- **Database**: Firebase Firestore
+- **Build Tool**: Vite
+- **Charts**: Recharts for data visualization
+- **Form Handling**: React Hook Form with Zod validation
 
-Simply visit the [Lovable Project](https://lovable.dev/projects/ce001853-2c7f-4a73-b58d-9608e3f60eaf) and start prompting.
+## 📦 Installation
 
-Changes made via Lovable will be committed automatically to this repo.
+### Prerequisites
 
-**Use your preferred IDE**
+- Node.js (v18 or higher)
+- npm or yarn package manager
+- Firebase project with Firestore enabled
 
-If you want to work locally using your own IDE, you can clone this repo and push changes. Pushed changes will also be reflected in Lovable.
+### Setup Instructions
 
-The only requirement is having Node.js & npm installed - [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating)
+1. **Clone the repository**
+   ```bash
+   git clone https://github.com/username/investment-dashboard.git
+   cd investment-dashboard
+   ```
 
-Follow these steps:
+2. **Install dependencies**
+   ```bash
+   npm install
+   ```
 
-```sh
-# Step 1: Clone the repository using the project's Git URL.
-git clone <YOUR_GIT_URL>
+3. **Environment Configuration**
+   Create a `.env` file in the project root:
+   ```env
+   # Firebase Configuration
+   VITE_FIREBASE_API_KEY="your-api-key"
+   VITE_FIREBASE_AUTH_DOMAIN="your-project-id.firebaseapp.com"
+   VITE_FIREBASE_PROJECT_ID="your-project-id"
+   VITE_FIREBASE_STORAGE_BUCKET="your-project-id.appspot.com"
+   VITE_FIREBASE_MESSAGING_SENDER_ID="your-messaging-sender-id"
+   VITE_FIREBASE_APP_ID="your-app-id"
+   ```
 
-# Step 2: Navigate to the project directory.
-cd <YOUR_PROJECT_NAME>
+4. **Firebase Setup**
+   - Create a new Firebase project at [Firebase Console](https://console.firebase.google.com/)
+   - Enable Firestore database
+   - Enable Authentication with email/password
+   - Copy your Firebase configuration to the `.env` file
 
-# Step 3: Install the necessary dependencies.
-npm i
+5. **Start the development server**
+   ```bash
+   npm run dev
+   ```
 
-# Step 4: Create a .env file for Firebase configuration (see "Environment Setup" section below)
+## 🎯 Usage
 
-# Step 5: Start the development server with auto-reloading and an instant preview.
-npm run dev
+### Getting Started
+
+1. **Registration**: Create a new account or login with existing credentials
+2. **Dashboard**: View your investment portfolio overview
+3. **Add Investments**: Navigate to specific asset dashboards to add transactions
+4. **Track Performance**: Monitor your portfolio performance with real-time updates
+
+### Investment Modules
+
+- **Gold Dashboard**: Track gold purchases with current market rates
+- **Silver Dashboard**: Monitor silver investments
+- **Stocks Dashboard**: Manage equity portfolio
+- **Mutual Funds Dashboard**: Track mutual fund investments
+- **FD Dashboard**: Monitor fixed deposits with maturity calculations
+- **RD Dashboard**: Track recurring deposit investments
+
+## 🏗️ Project Structure
+
+```
+src/
+├── components/          # Reusable UI components
+│   ├── ui/             # shadcn/ui components
+│   ├── Dashboard.tsx   # Main dashboard component
+│   ├── TransactionForm.tsx
+│   └── ...
+├── context/            # React contexts
+│   └── AuthContext.tsx
+├── dashboard/          # Global dashboard
+├── gold/              # Gold-specific components
+├── silver/            # Silver-specific components
+├── fd/                # Fixed deposit components
+├── rd/                # Recurring deposit components
+├── stocks/            # Stock-specific components
+├── mutualfunds/       # Mutual fund components
+├── hooks/             # Custom React hooks
+├── lib/               # Utility functions and services
+├── pages/             # Route pages
+└── App.tsx            # Main application component
 ```
 
-**Edit a file directly in GitHub**
+## 🔧 Configuration
 
-- Navigate to the desired file(s).
-- Click the "Edit" button (pencil icon) at the top right of the file view.
-- Make your changes and commit the changes.
+### Firebase Security Rules
 
-**Use GitHub Codespaces**
+Update your Firestore security rules in `firestore.rules`:
 
-- Navigate to the main page of your repository.
-- Click on the "Code" button (green button) near the top right.
-- Select the "Codespaces" tab.
-- Click on "New codespace" to launch a new Codespace environment.
-- Edit files directly within the Codespace and commit and push your changes once you're done.
-
-## Environment Setup
-
-This project uses Firebase for data persistence. To configure Firebase properly:
-
-1. Create a `.env` file in the project root with the following variables:
-
-```
-# Firebase Configuration
-VITE_FIREBASE_API_KEY="your-api-key"
-VITE_FIREBASE_AUTH_DOMAIN="your-project-id.firebaseapp.com"
-VITE_FIREBASE_PROJECT_ID="your-project-id"
-VITE_FIREBASE_STORAGE_BUCKET="your-project-id.appspot.com"
-VITE_FIREBASE_MESSAGING_SENDER_ID="your-messaging-sender-id"
-VITE_FIREBASE_APP_ID="your-app-id"
+```javascript
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    match /users/{userId} {
+      allow read, write: if request.auth != null && request.auth.uid == userId;
+    }
+    match /users/{userId}/transactions/{transactionId} {
+      allow read, write: if request.auth != null && request.auth.uid == userId;
+    }
+  }
+}
 ```
 
-2. Replace the placeholder values with your actual Firebase project configuration
-3. Make sure the `.env` file is included in `.gitignore` to keep your sensitive information secure
-4. Restart your development server if it's already running for changes to take effect
+## 📱 Available Scripts
 
-> **Note:** If you're deploying to a hosting platform, you'll need to configure these environment variables in your hosting platform's settings.
+- `npm run dev` - Start development server
+- `npm run build` - Build for production
+- `npm run build:dev` - Build for development
+- `npm run lint` - Run ESLint
+- `npm run preview` - Preview production build
 
-## What technologies are used for this project?
+## 🚀 Deployment
 
-This project is built with:
+The application can be deployed to various platforms:
 
-- Vite
-- TypeScript
-- React
-- shadcn-ui
-- Tailwind CSS
-- Firebase (Firestore)
+### Vercel/Netlify
+1. Build the project: `npm run build`
+2. Deploy the `dist` folder
+3. Configure environment variables in the hosting platform
 
-## How can I deploy this project?
+### Firebase Hosting
+1. Install Firebase CLI: `npm install -g firebase-tools`
+2. Login: `firebase login`
+3. Initialize: `firebase init hosting`
+4. Deploy: `firebase deploy`
 
-Simply open [Lovable](https://lovable.dev/projects/ce001853-2c7f-4a73-b58d-9608e3f60eaf) and click on Share -> Publish.
+## 🤝 Contributing
 
-**Important:** When deploying, make sure to set up the environment variables for Firebase in your hosting platform's configuration.
+1. Fork the repository
+2. Create a feature branch: `git checkout -b feature/new-feature`
+3. Commit changes: `git commit -m 'Add new feature'`
+4. Push to branch: `git push origin feature/new-feature`
+5. Submit a pull request
 
-## Can I connect a custom domain to my Lovable project?
+## 📄 License
 
-Yes, you can!
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
 
-To connect a domain, navigate to Project > Settings > Domains and click Connect Domain.
+## 🆘 Support
 
-Read more here: [Setting up a custom domain](https://docs.lovable.dev/tips-tricks/custom-domain#step-by-step-guide)
+For support, email support@investmentdashboard.com or create an issue in the GitHub repository.
+
+## 🔄 Version History
+
+- **v1.0.0**: Initial release with multi-asset portfolio tracking
+- More updates coming soon...
+
+## 🙏 Acknowledgments
+
+- [shadcn/ui](https://ui.shadcn.com/) for beautiful UI components
+- [Firebase](https://firebase.google.com/) for backend services
+- [Recharts](https://recharts.org/) for data visualization
+- [Lucide React](https://lucide.dev/) for icons
+
+---
+
+Made with ❤️ by [Abir Mahanta](https://github.com/username)

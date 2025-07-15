@@ -1,4 +1,4 @@
-import { db, auth } from './firebase';
+import { db, auth, isConfigValid } from './firebase';
 import { 
   collection, 
   addDoc, 
@@ -10,9 +10,7 @@ import {
   orderBy, 
   Timestamp,
   setDoc,
-  where,
-  collectionGroup,
-  writeBatch
+  where
 } from 'firebase/firestore';
 
 interface Transaction {
@@ -37,8 +35,22 @@ interface FirestoreTransaction {
   userId: string;
 }
 
+// Helper to validate Firebase configuration
+const validateFirebaseInitialization = () => {
+  if (!isConfigValid) {
+    throw new Error("Firebase configuration is invalid. Please check your .env file and ensure all required environment variables are set.");
+  }
+  if (!db) {
+    throw new Error("Firebase database is not initialized. Please check your Firebase configuration.");
+  }
+  if (!auth) {
+    throw new Error("Firebase authentication is not initialized. Please check your Firebase configuration.");
+  }
+};
+
 // Helper to get current user ID
 const getCurrentUserId = (): string => {
+  validateFirebaseInitialization();
   const user = auth.currentUser;
   if (!user) throw new Error("No authenticated user found. Please log in again.");
   return user.uid;
@@ -46,18 +58,13 @@ const getCurrentUserId = (): string => {
 
 // Collection references with security
 const getTransactionsCollection = () => {
-  if (!db) throw new Error("Firebase database is not initialized. Check your Firebase configuration.");
-  return collection(db, 'transactions');
-};
-
-const getSettingsCollection = () => {
-  if (!db) throw new Error("Firebase database is not initialized. Check your Firebase configuration.");
+  validateFirebaseInitialization();
   const userId = getCurrentUserId();
-  return collection(db, `users/${userId}/settings`);
+  return collection(db, `users/${userId}/investments/gold/transactions`);
 };
 
 const getUserSettingsDoc = () => {
-  if (!db) throw new Error("Firebase database is not initialized. Check your Firebase configuration.");
+  validateFirebaseInitialization();
   const userId = getCurrentUserId();
   return doc(db, `users/${userId}/settings/goldRate`);
 };
@@ -65,16 +72,13 @@ const getUserSettingsDoc = () => {
 // Transactions CRUD operations
 export const fetchTransactions = async (): Promise<Transaction[]> => {
   try {
-    // Log authentication status to debug
-    console.log("Auth state before fetching:", auth.currentUser ? "User authenticated" : "No authenticated user");
-    
+    validateFirebaseInitialization();
     const userId = getCurrentUserId();
     console.log("Fetching transactions for user ID:", userId);
     
     const q = query(
-      getTransactionsCollection(), 
-      where("userId", "==", userId),
-      orderBy('date', 'asc')
+      getTransactionsCollection(),
+      orderBy('date', 'desc')
     );
     
     console.log("Executing Firestore query...");
@@ -94,19 +98,21 @@ export const fetchTransactions = async (): Promise<Transaction[]> => {
         userId: data.userId,
       };
     });
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error("Error fetching transactions:", error);
-    if (error.code === 'permission-denied') {
+    if (error && typeof error === 'object' && 'code' in error && error.code === 'permission-denied') {
       throw new Error("Permission denied: You don't have access to these transactions. Please check your login status.");
-    } else if (!auth.currentUser) {
+    } else if (!auth?.currentUser) {
       throw new Error("Authentication error: Please log in again to fetch your transactions.");
     } else {
-      throw new Error(`Failed to fetch transactions: ${error.message || "Unknown error"}`);
+      const errorMessage = error instanceof Error ? error.message : "Unknown error";
+      throw new Error(`Failed to fetch transactions: ${errorMessage}`);
     }
   }
 };
 
 export const addTransaction = async (transaction: Omit<Transaction, 'id' | 'userId'>): Promise<string> => {
+  validateFirebaseInitialization();
   const userId = getCurrentUserId();
   
   const firestoreTransaction: Omit<FirestoreTransaction, 'id'> = {
@@ -125,19 +131,17 @@ export const addTransaction = async (transaction: Omit<Transaction, 'id' | 'user
 };
 
 export const updateTransaction = async (id: string, transaction: Partial<Omit<Transaction, 'id' | 'userId'>>): Promise<void> => {
+  validateFirebaseInitialization();
   const docRef = doc(getTransactionsCollection(), id);
   
-  // Create an empty update data object of type FirestoreTransaction
   const updateData: Partial<FirestoreTransaction> = {};
   
-  // Only copy over fields that exist in the transaction object
   if (transaction.amountSent !== undefined) updateData.amountSent = transaction.amountSent;
   if (transaction.goldRate !== undefined) updateData.goldRate = transaction.goldRate;
   if (transaction.taxAmount !== undefined) updateData.taxAmount = transaction.taxAmount;
   if (transaction.goldPurchased !== undefined) updateData.goldPurchased = transaction.goldPurchased;
   if (transaction.notes !== undefined) updateData.notes = transaction.notes;
   
-  // Handle date conversion separately
   if (transaction.date) {
     updateData.date = Timestamp.fromDate(new Date(transaction.date));
   }
@@ -146,6 +150,7 @@ export const updateTransaction = async (id: string, transaction: Partial<Omit<Tr
 };
 
 export const deleteTransaction = async (id: string): Promise<void> => {
+  validateFirebaseInitialization();
   const docRef = doc(getTransactionsCollection(), id);
   await deleteDoc(docRef);
 };
@@ -153,22 +158,27 @@ export const deleteTransaction = async (id: string): Promise<void> => {
 // Settings operations
 export const fetchCurrentGoldRate = async (): Promise<number | null> => {
   try {
-    const settingsDoc = await getDocs(getSettingsCollection());
+    validateFirebaseInitialization();
+    const userId = getCurrentUserId();
+    const settingsCollection = collection(db, `users/${userId}/settings`);
+    const settingsDoc = await getDocs(settingsCollection);
     const goldRateDoc = settingsDoc.docs.find(doc => doc.id === 'goldRate');
     
     if (goldRateDoc) {
       return goldRateDoc.data().value;
     }
     
-    return null;
+    // Return default rate if no setting found
+    return 7500;
   } catch (error) {
     console.error("Error fetching gold rate:", error);
-    return null;
+    return 7500; // Default fallback
   }
 };
 
 export const updateCurrentGoldRate = async (rate: number): Promise<void> => {
   try {
+    validateFirebaseInitialization();
     await setDoc(getUserSettingsDoc(), { 
       value: rate,
       updatedAt: Timestamp.now() 
@@ -179,73 +189,55 @@ export const updateCurrentGoldRate = async (rate: number): Promise<void> => {
   }
 };
 
-// Check if there are old transactions without user IDs
+// Legacy data migration functions
 export const checkForLegacyData = async (): Promise<boolean> => {
   try {
-    // Query for any transaction without a userId field
-    const q = query(getTransactionsCollection(), where("userId", "==", null));
-    const snapshot = await getDocs(q);
+    validateFirebaseInitialization();
     
-    // Also check for transactions where userId is undefined
-    const q2 = query(getTransactionsCollection());
-    const snapshot2 = await getDocs(q2);
+    // Check if there's any data in the old structure (root level collections)
+    const legacyTransactions = collection(db, 'transactions');
+    const legacySnapshot = await getDocs(legacyTransactions);
     
-    const legacyDocs = snapshot2.docs.filter(doc => {
-      const data = doc.data();
-      return data.userId === undefined;
-    });
-    
-    return snapshot.docs.length > 0 || legacyDocs.length > 0;
+    return !legacySnapshot.empty;
   } catch (error) {
     console.error("Error checking for legacy data:", error);
     return false;
   }
 };
 
-// Migrate old data to be associated with the current user
 export const migrateUserData = async (): Promise<boolean> => {
   try {
+    validateFirebaseInitialization();
     const userId = getCurrentUserId();
-    const batch = writeBatch(db);
     
-    // Find transactions without a userId field
-    const q = query(getTransactionsCollection());
-    const snapshot = await getDocs(q);
+    // Get legacy transactions
+    const legacyTransactions = collection(db, 'transactions');
+    const legacySnapshot = await getDocs(legacyTransactions);
     
-    let migratedCount = 0;
-    
-    snapshot.docs.forEach(docSnapshot => {
-      const data = docSnapshot.data();
-      if (!data.userId) {
-        // Add the current userId to this transaction
-        const docRef = doc(getTransactionsCollection(), docSnapshot.id);
-        batch.update(docRef, { userId });
-        migratedCount++;
-      }
-    });
-    
-    // If there's legacy data, commit the batch
-    if (migratedCount > 0) {
-      await batch.commit();
-      console.log(`Migrated ${migratedCount} transactions to user ${userId}`);
+    if (legacySnapshot.empty) {
+      console.log("No legacy data found to migrate");
+      return false;
     }
     
-    // Migrate any old gold rate data to the user-specific location
-    const oldSettingsCollection = collection(db, 'settings');
-    const oldSettingsSnapshot = await getDocs(oldSettingsCollection);
-    const goldRateDoc = oldSettingsSnapshot.docs.find(doc => doc.id === 'goldRate');
+    // Migrate transactions to new user-specific structure
+    const userTransactionsCollection = collection(db, `users/${userId}/investments/gold/transactions`);
     
-    if (goldRateDoc) {
-      const goldRateData = goldRateDoc.data();
-      await updateCurrentGoldRate(goldRateData.value);
+    for (const doc of legacySnapshot.docs) {
+      const data = doc.data();
       
-      // Optionally delete the old goldRate document
-      // await deleteDoc(doc(oldSettingsCollection, 'goldRate'));
+      // Add userId and migrate to new structure
+      await addDoc(userTransactionsCollection, {
+        ...data,
+        userId,
+        createdAt: data.createdAt || Timestamp.now(),
+        migratedAt: Timestamp.now()
+      });
     }
     
+    console.log(`Successfully migrated ${legacySnapshot.docs.length} transactions`);
     return true;
   } catch (error) {
     console.error("Error migrating user data:", error);
-    return false;
+    throw error;
   }
 };
